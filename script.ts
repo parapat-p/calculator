@@ -13,7 +13,7 @@ function operate(a:number,b:number,operator:string){
             return a-b;
         case "/":
             if(b===0){
-                throw new Error(`Divide by zero!`);
+                return "Error Divide by Zero";
             }
             return a/b;
         case "*":
@@ -74,6 +74,19 @@ function toggleOperatorPad(action:string){
             grid.removeEventListener("click",gridEvent);
             })
             disableOperatorPad = true;
+            break;
+    }
+}
+
+function toggleSinglePad(gridBox:HTMLDivElement,action:string){
+    switch(action){
+        case "On":
+            gridBox.style.opacity = "1";
+            gridBox.addEventListener("click",gridEvent);
+            break;
+        case "Off":
+            gridBox.style.opacity = "0.2";
+            gridBox.removeEventListener("click",gridEvent);
             break;
     }
 }
@@ -144,14 +157,19 @@ function assignClassToPad(gridBox:HTMLDivElement){
             grid.style.opacity = "0.2";
             grid.removeEventListener("click",gridEvent);
         })
+    operatePadGrid[4][0].className = "float";
 }
 
 let displayText:string[] = [""];
 let currPointerTextDisplay:number = 0;
+let currentIsFloat = false;
 
 function updateDisplay(gridBox:HTMLDivElement){
     const display = selectDivQueryTypeSafe("Display");
     let text = gridBox.textContent;
+    if(!currentIsFloat && gridBox.className!=="float"){
+        toggleSinglePad(operatePadGrid[4][0],"On");
+    }
     switch(text){
         case "Clear":
             display.textContent = "";
@@ -171,12 +189,22 @@ function updateDisplay(gridBox:HTMLDivElement){
             }
             break;
 
+        case ".":
+            if(displayText[currPointerTextDisplay].indexOf(".") === -1){
+                display.textContent += text;
+                displayText[currPointerTextDisplay]+= text;
+                toggleSinglePad(gridBox,"Off");
+                currentIsFloat = true;
+            }
+            break;
+
         default:
             display.textContent += text;
             if(gridBox.className === "number"){
                 displayText[currPointerTextDisplay] += text;
             }
             else{
+                currentIsFloat = false;
                 displayText.push(text)
                 displayText.push("")
                 currPointerTextDisplay += 2;
@@ -187,13 +215,15 @@ function updateDisplay(gridBox:HTMLDivElement){
     return;
 }
 
+const numPad = selectDivQueryTypeSafe("Numpad");
+numPad.style.gap = `${gapNumpad}px`;
+const operatePadGrid = createGrid(numPad,4,5);
 
 function main(){
-    const numPad = selectDivQueryTypeSafe("Numpad");
-    numPad.style.gap = `${gapNumpad}px`;
-    const operatePadGrid = createGrid(numPad,4,5);
     assignOperatePad(operatePadGrid);
     console.log("This is worked!");
 }
+
+
 
 main();
