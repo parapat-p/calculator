@@ -1,0 +1,33 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.Calculator {
+    width: 1080px;
+    height: 800px;
+    border: 1px solid;
+}
+
+.Display {
+    width: 90%;
+    height: 25%;
+    border: 1px solid;
+    margin-top: 50px;
+    margin-left: 50px;
+}
+
+.OpeartePad{
+    display: flex;
+    width: 980px;
+    height: 475px;
+    margin-top: 50px;
+    margin-left: 50px;
+}
+
+.Numpad{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
