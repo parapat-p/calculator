@@ -2,21 +2,53 @@
 var gapNumpad = 20;
 var operatePad = "789/456*123-.0=+";
 var disableOperatorPad = true;
+var currentSolution = "";
+var divZeroflag = false;
 //
 function operate(a, b, operator) {
     switch (operator) {
         case "+":
-            return a + b;
+            return String(a + b);
         case "-":
-            return a - b;
+            return String(a - b);
         case "/":
             if (b === 0) {
-                return "Error Divide by Zero";
+                return "NaN";
             }
-            return a / b;
+            return String(a / b);
         case "*":
-            return a * b;
+            return String(a * b);
+        default:
+            return String(0);
     }
+}
+function resetDisplay() {
+    var display = selectDivQueryTypeSafe("Display");
+    display.textContent = "";
+    displayText = [""];
+    currPointerTextDisplay = 0;
+}
+function calculate() {
+    var display = selectDivQueryTypeSafe("Display");
+    if (displayText.length === 3) {
+        var a = Number(displayText[0]);
+        var operator = displayText[1];
+        var b = Number(displayText[2]);
+        currentSolution = operate(a, b, operator);
+        if (currentSolution === "NaN") {
+            display.textContent = "Divide by zero detected";
+            divZeroflag = true;
+        }
+        else {
+            display.textContent = currentSolution;
+            displayText = [currentSolution];
+        }
+        currPointerTextDisplay = 0;
+    }
+    else {
+        currentSolution = displayText[0];
+    }
+    return;
 }
 function createBox() {
     var grid = document.createElement("div");
@@ -35,7 +67,12 @@ function gridEvent(e) {
     var currentInput = gridBox.className;
     if (currentInput === "operator") {
         updateDisplay(gridBox);
-        toggleOperatorPad("Off");
+        if (gridBox.textContent !== "=") {
+            toggleOperatorPad("Off");
+        }
+        else {
+            //DO nothing
+        }
     }
     else if (currentInput === "number") {
         updateDisplay(gridBox);
@@ -146,6 +183,7 @@ function assignClassToPad(gridBox) {
     });
     operatePadGrid[4][0].className = "float";
 }
+var display = selectDivQueryTypeSafe("Display");
 var displayText = [""];
 var currPointerTextDisplay = 0;
 var currentIsFloat = false;
@@ -157,8 +195,7 @@ function updateDisplay(gridBox) {
     }
     switch (text) {
         case "Clear":
-            display.textContent = "";
-            displayText = [""];
+            resetDisplay();
             break;
         case "Delete":
             var bufferText = display.textContent.split("");
@@ -180,8 +217,26 @@ function updateDisplay(gridBox) {
                 currentIsFloat = true;
             }
             break;
+        case "=":
+            if (displayText.length === 3) {
+                calculate();
+            }
+            else {
+                display.textContent = currentSolution;
+                displayText = [currentSolution];
+                currPointerTextDisplay = 0;
+            }
+            toggleOperatorPad("On");
+            break;
         default:
+            if (gridBox.className === "operator") {
+                calculate();
+            }
             display.textContent += text;
+            if (divZeroflag) {
+                divZeroflag = false;
+                resetDisplay();
+            }
             if (gridBox.className === "number") {
                 displayText[currPointerTextDisplay] += text;
             }
