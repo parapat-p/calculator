@@ -112,36 +112,41 @@ function assignClassToPad(gridBox:HTMLDivElement){
 
 let displayText:string[] = [""];
 let currPointerTextDisplay:number = 0;
+let lastInput = "";
 
 function updateDisplay(gridBox:HTMLDivElement){
     const display = selectDivQueryTypeSafe("Display");
     let text = gridBox.textContent;
-    if(text==="Clear"){
-        display.textContent = "";
-        displayText = [""];
-    }
-    else if(text==="Delete"){
-        let bufferText:string[] = display.textContent.split("");
-        display.textContent=bufferText.slice(0,bufferText.length-1).join("");
-        if((displayText[currPointerTextDisplay]==="") && (displayText.length!=1)){
-            displayText.pop();
-            displayText.pop();
-            currPointerTextDisplay -= 2;
-        }
-        else{
-            displayText[currPointerTextDisplay] = displayText[currPointerTextDisplay].slice(0,displayText[currPointerTextDisplay].length-1);
-        }
-    }
-    else{
-        display.textContent += text;
-        if(gridBox.className === "number"){
-            displayText[currPointerTextDisplay] += text;
-        }
-        else{
-            displayText.push(text)
-            displayText.push("")
-            currPointerTextDisplay += 2;
-        }
+    switch(text){
+        case "Clear":
+            display.textContent = "";
+            displayText = [""];
+            break;
+
+        case "Delete":
+            let bufferText:string[] = display.textContent.split("");
+            display.textContent=bufferText.slice(0,bufferText.length-1).join("");
+            if((displayText[currPointerTextDisplay]==="") && (displayText.length!=1)){
+                displayText.pop();
+                displayText.pop();
+                currPointerTextDisplay -= 2;
+            }
+            else{
+                displayText[currPointerTextDisplay] = displayText[currPointerTextDisplay].slice(0,displayText[currPointerTextDisplay].length-1);
+            }
+            break;
+            
+        default:
+            display.textContent += text;
+            if(gridBox.className === "number"){
+                displayText[currPointerTextDisplay] += text;
+            }
+            else{
+                displayText.push(text)
+                displayText.push("")
+                currPointerTextDisplay += 2;
+            }
+            break;
     }
     console.log(displayText);
     return;
