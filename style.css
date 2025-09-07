@@ -16,6 +16,10 @@ body {
     border: 1px solid;
     margin-top: 50px;
     margin-left: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    font-size: 32px;
 }
 
 .OpeartePad{

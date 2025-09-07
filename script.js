@@ -1,6 +1,6 @@
 // Define setting
 var gapNumpad = 20;
-var operatePad = "789/456*123-0.=+";
+var operatePad = "789/456*123-.0=+";
 //
 function add(a, b) {
     return a + b;
@@ -28,7 +28,6 @@ function operate(a, b, operator) {
 }
 function createBox() {
     var grid = document.createElement("div");
-    grid.className = "numpad";
     grid.style.display = "flex";
     // grid.style.boxSizing = "border-box";
     grid.style.border = "1px solid";
@@ -36,6 +35,10 @@ function createBox() {
     grid.style.justifyContent = "center";
     grid.style.alignItems = "center";
     grid.style.fontSize = "32px";
+    grid.textContent = "";
+    grid.addEventListener("click", function () {
+        updateDisplay(grid);
+    });
     return grid;
 }
 function createRowGrid() {
@@ -74,17 +77,67 @@ function assignOperatePad(gridArray) {
     var row = gridArray.length;
     var column = gridArray[0].length;
     var indexOperatePad = 0;
-    for (var i = 0; i < row; i++) {
+    gridArray[0][0].textContent = "Clear";
+    gridArray[0][1].textContent = "Delete";
+    gridArray[0][2].remove();
+    gridArray[0][3].remove();
+    for (var i = 1; i < row; i++) {
         for (var j = 0; j < column; j++) {
             gridArray[i][j].textContent = operatePad.split("")[indexOperatePad];
+            assignClassToPad(gridArray[i][j]);
             indexOperatePad += 1;
         }
     }
 }
+function assignClassToPad(gridBox) {
+    var content = parseInt(gridBox.textContent);
+    if (content) {
+        gridBox.className = "number";
+    }
+    else {
+        gridBox.className = "operator";
+    }
+    return;
+}
+var displayText = [""];
+var currPointerTextDisplay = 0;
+function updateDisplay(gridBox) {
+    var display = selectDivQueryTypeSafe("Display");
+    var text = gridBox.textContent;
+    if (text === "Clear") {
+        display.textContent = "";
+        displayText = [""];
+    }
+    else if (text === "Delete") {
+        var bufferText = display.textContent.split("");
+        display.textContent = bufferText.slice(0, bufferText.length - 1).join("");
+        if ((displayText[currPointerTextDisplay] === "") && (displayText.length != 1)) {
+            displayText.pop();
+            displayText.pop();
+            currPointerTextDisplay -= 2;
+        }
+        else {
+            displayText[currPointerTextDisplay] = displayText[currPointerTextDisplay].slice(0, displayText[currPointerTextDisplay].length - 1);
+        }
+    }
+    else {
+        display.textContent += text;
+        if (gridBox.className === "number") {
+            displayText[currPointerTextDisplay] += text;
+        }
+        else {
+            displayText.push(text);
+            displayText.push("");
+            currPointerTextDisplay += 2;
+        }
+    }
+    console.log(displayText);
+    return;
+}
 function main() {
     var numPad = selectDivQueryTypeSafe("Numpad");
     numPad.style.gap = "".concat(gapNumpad, "px");
-    var operatePadGrid = createGrid(numPad, 4, 4);
+    var operatePadGrid = createGrid(numPad, 4, 5);
     assignOperatePad(operatePadGrid);
     console.log("This is worked!");
 }
