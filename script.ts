@@ -1,52 +1,83 @@
 // Define setting
 const gapNumpad = 20;
 const operatePad = "789/456*123-.0=+";
+let disableOperatorPad = true;
 //
 
-function add(a:number,b:number){
-    return a+b;
-}
-
-function subtract(a:number,b:number){
-    return a-b;
-}
-
-function multiply(a:number,b:number){
-    return a*b;
-}
-
-function divide(a:number,b:number){
-    return a/b;
-}
 
 function operate(a:number,b:number,operator:string){
     switch(operator){
         case "+":
-            return add(a,b);
+            return a+b;
         case "-":
-            return subtract(a,b);
-        case "*":
-            return multiply(a,b);
+            return a-b;
         case "/":
-            return divide(a,b);
+            if(b===0){
+                throw new Error(`Divide by zero!`);
+            }
+            return a/b;
+        case "*":
+            return a*b;
     }
 }
 
 function createBox(): HTMLDivElement{
     let grid:HTMLDivElement = document.createElement("div");
     grid.style.display = "flex";
-    // grid.style.boxSizing = "border-box";
     grid.style.border = "1px solid";
     grid.style.flex = "1";
     grid.style.justifyContent = "center";
     grid.style.alignItems = "center";
     grid.style.fontSize = "32px";
     grid.textContent = "";
-    grid.addEventListener("click",() => {
-        updateDisplay(grid);
-    });
+    grid.addEventListener("click",gridEvent)
     return grid
 }
+
+function gridEvent(e: MouseEvent){
+    const gridBox = e.currentTarget as HTMLDivElement;
+    const currentInput = gridBox.className;
+    if(currentInput==="operator"){
+        updateDisplay(gridBox);
+        toggleOperatorPad("Off");
+
+    }
+    else if(currentInput==="number"){
+        updateDisplay(gridBox);
+        if(disableOperatorPad){
+            toggleOperatorPad("On");
+        }
+    }
+    else{
+        updateDisplay(gridBox);
+        if(displayText[currPointerTextDisplay]===""){
+            toggleOperatorPad("Off");
+        }
+    }
+
+
+}
+
+function toggleOperatorPad(action:string){
+    const gridOperators = document.querySelectorAll<HTMLDivElement>(".operator");
+    switch(action){
+        case "On":
+            gridOperators.forEach(grid => {
+            grid.style.opacity = "1";
+            grid.addEventListener("click",gridEvent);
+            })
+            disableOperatorPad = false;
+            break;
+        case "Off":
+            gridOperators.forEach(grid => {
+            grid.style.opacity = "0.2";
+            grid.removeEventListener("click",gridEvent);
+            })
+            disableOperatorPad = true;
+            break;
+    }
+}
+
 
 function createRowGrid() :HTMLDivElement{
     let rowGrid = document.createElement("div");
@@ -100,19 +131,23 @@ function assignOperatePad(gridArray:HTMLDivElement[][]){
 }
 
 function assignClassToPad(gridBox:HTMLDivElement){
-    let content = parseInt(gridBox.textContent);
-    if(content){
+    const text = gridBox.textContent ?? "";
+    const num = Number(text);
+
+    if (!isNaN(num) && text.trim() !== "") {
         gridBox.className = "number";
-    }
-    else{
+    } else {
         gridBox.className = "operator";
     }
-    return;
+    const gridOperators = document.querySelectorAll<HTMLDivElement>(".operator");
+            gridOperators.forEach(grid => {
+            grid.style.opacity = "0.2";
+            grid.removeEventListener("click",gridEvent);
+        })
 }
 
 let displayText:string[] = [""];
 let currPointerTextDisplay:number = 0;
-let lastInput = "";
 
 function updateDisplay(gridBox:HTMLDivElement){
     const display = selectDivQueryTypeSafe("Display");
@@ -135,7 +170,7 @@ function updateDisplay(gridBox:HTMLDivElement){
                 displayText[currPointerTextDisplay] = displayText[currPointerTextDisplay].slice(0,displayText[currPointerTextDisplay].length-1);
             }
             break;
-            
+
         default:
             display.textContent += text;
             if(gridBox.className === "number"){

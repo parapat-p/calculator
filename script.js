@@ -1,45 +1,73 @@
 // Define setting
 var gapNumpad = 20;
 var operatePad = "789/456*123-.0=+";
+var disableOperatorPad = true;
 //
-function add(a, b) {
-    return a + b;
-}
-function subtract(a, b) {
-    return a - b;
-}
-function multiply(a, b) {
-    return a * b;
-}
-function divide(a, b) {
-    return a / b;
-}
 function operate(a, b, operator) {
     switch (operator) {
         case "+":
-            return add(a, b);
+            return a + b;
         case "-":
-            return subtract(a, b);
-        case "*":
-            return multiply(a, b);
+            return a - b;
         case "/":
-            return divide(a, b);
+            if (b === 0) {
+                throw new Error("Divide by zero!");
+            }
+            return a / b;
+        case "*":
+            return a * b;
     }
 }
 function createBox() {
     var grid = document.createElement("div");
     grid.style.display = "flex";
-    // grid.style.boxSizing = "border-box";
     grid.style.border = "1px solid";
     grid.style.flex = "1";
     grid.style.justifyContent = "center";
     grid.style.alignItems = "center";
     grid.style.fontSize = "32px";
     grid.textContent = "";
-    grid.addEventListener("click", function () {
-        updateDisplay(grid);
-    });
+    grid.addEventListener("click", gridEvent);
     return grid;
+}
+function gridEvent(e) {
+    var gridBox = e.currentTarget;
+    var currentInput = gridBox.className;
+    if (currentInput === "operator") {
+        updateDisplay(gridBox);
+        toggleOperatorPad("Off");
+    }
+    else if (currentInput === "number") {
+        updateDisplay(gridBox);
+        if (disableOperatorPad) {
+            toggleOperatorPad("On");
+        }
+    }
+    else {
+        updateDisplay(gridBox);
+        if (displayText[currPointerTextDisplay] === "") {
+            toggleOperatorPad("Off");
+        }
+    }
+}
+function toggleOperatorPad(action) {
+    var gridOperators = document.querySelectorAll(".operator");
+    switch (action) {
+        case "On":
+            gridOperators.forEach(function (grid) {
+                grid.style.opacity = "1";
+                grid.addEventListener("click", gridEvent);
+            });
+            disableOperatorPad = false;
+            break;
+        case "Off":
+            gridOperators.forEach(function (grid) {
+                grid.style.opacity = "0.2";
+                grid.removeEventListener("click", gridEvent);
+            });
+            disableOperatorPad = true;
+            break;
+    }
 }
 function createRowGrid() {
     var rowGrid = document.createElement("div");
@@ -90,18 +118,23 @@ function assignOperatePad(gridArray) {
     }
 }
 function assignClassToPad(gridBox) {
-    var content = parseInt(gridBox.textContent);
-    if (content) {
+    var _a;
+    var text = (_a = gridBox.textContent) !== null && _a !== void 0 ? _a : "";
+    var num = Number(text);
+    if (!isNaN(num) && text.trim() !== "") {
         gridBox.className = "number";
     }
     else {
         gridBox.className = "operator";
     }
-    return;
+    var gridOperators = document.querySelectorAll(".operator");
+    gridOperators.forEach(function (grid) {
+        grid.style.opacity = "0.2";
+        grid.removeEventListener("click", gridEvent);
+    });
 }
 var displayText = [""];
 var currPointerTextDisplay = 0;
-var lastInput = "";
 function updateDisplay(gridBox) {
     var display = selectDivQueryTypeSafe("Display");
     var text = gridBox.textContent;
