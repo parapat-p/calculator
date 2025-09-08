@@ -4,6 +4,7 @@ const operatePad:string = "789/456*123-.0=+";
 let disableOperatorPad:boolean = true;
 let currentSolution:string = "";
 let divZeroflag = false;
+let showResult = false;
 //
 
 
@@ -51,10 +52,12 @@ function calculate() {
             displayText = [currentSolution];
         }
         currPointerTextDisplay=0;
+        
     }
     else{
         currentSolution=displayText[0];
     }
+    showResult = true;
     return;
 }
 
@@ -97,8 +100,6 @@ function gridEvent(e: MouseEvent){
             toggleOperatorPad("Off");
         }
     }
-
-
 }
 
 function toggleOperatorPad(action:string){
@@ -255,6 +256,7 @@ function updateDisplay(gridBox:HTMLDivElement){
             break;
 
         case "Delete":
+            toggleOperatorPad("On");
             let bufferText:string[] = display.textContent.split("");
             display.textContent=bufferText.slice(0,bufferText.length-1).join("");
             if((displayText[currPointerTextDisplay]==="") && (displayText.length!=1)){
@@ -287,25 +289,30 @@ function updateDisplay(gridBox:HTMLDivElement){
             }
             toggleOperatorPad("On");
             break;
-
+        
         default:
-            if(gridBox.className==="operator"){
+            if(gridBox.className==="operator" && displayText.length === 3){
                 calculate();
             }
-            display.textContent += text;
             if(divZeroflag){
                     divZeroflag = false;
                     resetDisplay()
                 }
             if(gridBox.className === "number"){
+                if(showResult){
+                    showResult=false;
+                    resetDisplay();
+                }
                 displayText[currPointerTextDisplay] += text;
             }
             else{
+                showResult=false;
                 currentIsFloat = false;
                 displayText.push(text)
                 displayText.push("")
                 currPointerTextDisplay += 2;
             }
+            display.textContent += text;
             break;
     }
     console.log(displayText);

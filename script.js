@@ -4,6 +4,7 @@ var operatePad = "789/456*123-.0=+";
 var disableOperatorPad = true;
 var currentSolution = "";
 var divZeroflag = false;
+var showResult = false;
 //
 function operate(a, b, operator) {
     switch (operator) {
@@ -48,6 +49,7 @@ function calculate() {
     else {
         currentSolution = displayText[0];
     }
+    showResult = true;
     return;
 }
 function createBox() {
@@ -232,6 +234,7 @@ function updateDisplay(gridBox) {
             resetDisplay();
             break;
         case "Delete":
+            toggleOperatorPad("On");
             var bufferText = display.textContent.split("");
             display.textContent = bufferText.slice(0, bufferText.length - 1).join("");
             if ((displayText[currPointerTextDisplay] === "") && (displayText.length != 1)) {
@@ -263,23 +266,28 @@ function updateDisplay(gridBox) {
             toggleOperatorPad("On");
             break;
         default:
-            if (gridBox.className === "operator") {
+            if (gridBox.className === "operator" && displayText.length === 3) {
                 calculate();
             }
-            display.textContent += text;
             if (divZeroflag) {
                 divZeroflag = false;
                 resetDisplay();
             }
             if (gridBox.className === "number") {
+                if (showResult) {
+                    showResult = false;
+                    resetDisplay();
+                }
                 displayText[currPointerTextDisplay] += text;
             }
             else {
+                showResult = false;
                 currentIsFloat = false;
                 displayText.push(text);
                 displayText.push("");
                 currPointerTextDisplay += 2;
             }
+            display.textContent += text;
             break;
     }
     console.log(displayText);
