@@ -156,6 +156,10 @@ function assignOperatePad(gridArray) {
     var indexOperatePad = 0;
     gridArray[0][0].textContent = "Clear";
     gridArray[0][1].textContent = "Delete";
+    setGridStyleOperator(gridArray[0][0]);
+    setGridStyleOperator(gridArray[0][1]);
+    addHover(gridArray[0][0]);
+    addHover(gridArray[0][1]);
     gridArray[0][2].remove();
     gridArray[0][3].remove();
     for (var i = 1; i < row; i++) {
@@ -166,21 +170,51 @@ function assignOperatePad(gridArray) {
         }
     }
 }
+function addHover(gridBox) {
+    var boxClass = gridBox.className;
+    if (boxClass === "number") {
+        gridBox.addEventListener("mouseenter", function () {
+            gridBox.style.backgroundColor = "#ccc";
+        });
+        gridBox.addEventListener("mouseleave", function () {
+            gridBox.style.backgroundColor = "#ffffff";
+        });
+    }
+    else {
+        gridBox.addEventListener("mouseenter", function () {
+            gridBox.style.backgroundColor = "#e07b00";
+        });
+        gridBox.addEventListener("mouseleave", function () {
+            gridBox.style.backgroundColor = "#ff9500";
+        });
+    }
+}
+function setGridStyleOperator(gridBox) {
+    gridBox.style.backgroundColor = "#ff9500";
+    gridBox.style.color = "#ffffff";
+}
+function setGridStyleNumber(gridBox) {
+    gridBox.style.backgroundColor = "#ffffff";
+    gridBox.style.color = "#000000";
+}
 function assignClassToPad(gridBox) {
     var _a;
     var text = (_a = gridBox.textContent) !== null && _a !== void 0 ? _a : "";
     var num = Number(text);
     if (!isNaN(num) && text.trim() !== "") {
         gridBox.className = "number";
+        setGridStyleNumber(gridBox);
     }
     else {
         gridBox.className = "operator";
+        setGridStyleOperator(gridBox);
     }
     var gridOperators = document.querySelectorAll(".operator");
     gridOperators.forEach(function (grid) {
         grid.style.opacity = "0.2";
         grid.removeEventListener("click", gridEvent);
     });
+    addHover(gridBox);
     operatePadGrid[4][0].className = "float";
 }
 var display = selectDivQueryTypeSafe("Display");

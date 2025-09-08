@@ -69,6 +69,7 @@ function createBox(): HTMLDivElement{
     grid.style.fontSize = "32px";
     grid.textContent = "";
     grid.addEventListener("click",gridEvent)
+    
     return grid
 }
 
@@ -174,6 +175,10 @@ function assignOperatePad(gridArray:HTMLDivElement[][]){
     let indexOperatePad = 0;
     gridArray[0][0].textContent = "Clear";
     gridArray[0][1].textContent = "Delete";
+    setGridStyleOperator(gridArray[0][0])
+    setGridStyleOperator(gridArray[0][1])
+    addHover(gridArray[0][0]);
+    addHover(gridArray[0][1]);
     gridArray[0][2].remove();
     gridArray[0][3].remove();
     for(let i = 1;i<row;i++){
@@ -185,20 +190,52 @@ function assignOperatePad(gridArray:HTMLDivElement[][]){
     }
 }
 
+function addHover(gridBox:HTMLDivElement){
+    let boxClass = gridBox.className;
+    if(boxClass==="number"){
+        gridBox.addEventListener("mouseenter",() =>{
+            gridBox.style.backgroundColor = "#ccc";
+        })
+        gridBox.addEventListener("mouseleave",() => {
+            gridBox.style.backgroundColor = "#ffffff";
+        });
+    }
+    else{
+        gridBox.addEventListener("mouseenter",() => {
+            gridBox.style.backgroundColor = "#e07b00";
+        });
+        gridBox.addEventListener("mouseleave",() => {
+            gridBox.style.backgroundColor = "#ff9500";
+        });
+    }
+}
+
+function setGridStyleOperator(gridBox:HTMLDivElement){
+    gridBox.style.backgroundColor = "#ff9500";
+    gridBox.style.color = "#ffffff";
+}
+
+function setGridStyleNumber(gridBox:HTMLDivElement){
+    gridBox.style.backgroundColor = "#ffffff";
+    gridBox.style.color = "#000000";
+}
+
 function assignClassToPad(gridBox:HTMLDivElement){
     const text = gridBox.textContent ?? "";
     const num = Number(text);
-
     if (!isNaN(num) && text.trim() !== "") {
         gridBox.className = "number";
+        setGridStyleNumber(gridBox);
     } else {
         gridBox.className = "operator";
+        setGridStyleOperator(gridBox);
     }
     const gridOperators = document.querySelectorAll<HTMLDivElement>(".operator");
             gridOperators.forEach(grid => {
             grid.style.opacity = "0.2";
             grid.removeEventListener("click",gridEvent);
         })
+    addHover(gridBox);
     operatePadGrid[4][0].className = "float";
 }
 const display = selectDivQueryTypeSafe("Display");

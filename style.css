@@ -2,24 +2,30 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    font-family: "Noto Sans", sans-serif;
+    background-color: #1e1e1e;
+    color: white;
 }
 
 .Calculator {
     width: 1080px;
     height: 800px;
-    border: 1px solid;
+    border: 3px solid;
+    background-color: papayawhip;
 }
 
 .Display {
     width: 90%;
     height: 25%;
-    border: 1px solid;
+    border: 3px solid;
     margin-top: 50px;
     margin-left: 50px;
     display: flex;
     align-items: center;
     justify-content: end;
-    font-size: 32px;
+    font-size: 64px;
+    background-color: lightgray;
+    color: black;
 }
 
 .OpeartePad{
